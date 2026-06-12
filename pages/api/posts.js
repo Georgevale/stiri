@@ -35,6 +35,7 @@ async function readData() {
       const content = Buffer.from(j.content, 'base64').toString('utf8')
       return JSON.parse(content)
     } catch (e) {
+      console.error('GitHub read error', e && e.message ? e.message : e)
       return []
     }
   }
@@ -65,6 +66,7 @@ async function writeData(data) {
     const putRes = await fetch(url, { method: 'PUT', headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     if (!putRes.ok) {
       const txt = await putRes.text().catch(()=>'')
+      console.error('GitHub update failed', putRes.status, txt)
       throw new Error('GitHub update failed: ' + txt)
     }
     return
@@ -115,9 +117,10 @@ export default async function handler(req, res) {
       const updated = [newPost, ...posts]
       await writeData(updated)
       res.status(201).json(newPost)
-    } catch (e) {
-      res.status(500).json({ error: 'Server error' })
-    }
+      } catch (e) {
+        console.error('POST write error', e && e.message ? e.message : e)
+        res.status(500).json({ error: 'Server error' })
+      }
     return
   }
 
@@ -139,6 +142,7 @@ export default async function handler(req, res) {
       await writeData(updated)
       res.status(200).json({ ok: true })
     } catch (e) {
+      console.error('PUT write error', e && e.message ? e.message : e)
       res.status(500).json({ error: 'Server error' })
     }
     return
@@ -152,6 +156,7 @@ export default async function handler(req, res) {
       await writeData(updated)
       res.status(200).json({ ok: true })
     } catch (e) {
+      console.error('DELETE write error', e && e.message ? e.message : e)
       res.status(500).json({ error: 'Server error' })
     }
     return
