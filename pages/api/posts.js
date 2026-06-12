@@ -82,6 +82,14 @@ async function writeData(data) {
     if (!putRes.ok) {
       const txt = await putRes.text().catch(()=>'')
       console.error('GitHub update failed', putRes.status, txt)
+      try {
+        const info = await fetch('https://api.github.com/user', { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } })
+        const scopes = info.headers && info.headers.get ? info.headers.get('x-oauth-scopes') : null
+        const infoTxt = await info.text().catch(()=>'(no body)')
+        console.error('GitHub token check', info.status, 'scopes=', scopes, infoTxt)
+      } catch (ie) {
+        console.error('GitHub token check failed', ie && ie.message ? ie.message : ie)
+      }
       throw new Error('GitHub update failed: ' + txt)
     }
     return
