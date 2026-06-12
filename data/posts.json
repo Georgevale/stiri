@@ -1,5 +1,21 @@
 [
   {
+    "id": "1781299619742",
+    "slug": "automated-test",
+    "title": "Automated test",
+    "excerpt": "test",
+    "content": "automated test content",
+    "image": "",
+    "categories": [
+      "test"
+    ],
+    "tags": [
+      "auto"
+    ],
+    "author": "Redacția ȘtiriAcum",
+    "date": "2026-06-12T21:26:59.742Z"
+  },
+  {
     "id": "1781277280726",
     "slug": "situa-ia-din-ucraina-actualizare",
     "title": "Situa?ia din Ucraina: actualizare",
