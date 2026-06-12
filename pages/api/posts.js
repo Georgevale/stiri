@@ -28,7 +28,9 @@ async function readData() {
   // If a GitHub token and repo are configured, read the file from the repo
   if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) {
     try {
+      console.error('GITHUB_REPO for posts API:', process.env.GITHUB_REPO || '<<missing>>')
       const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/data/posts.json`
+      console.error('GitHub read URL', url)
       const res = await fetch(url, { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } })
       if (!res.ok) {
         const txt = await res.text().catch(()=>'')
@@ -57,16 +59,25 @@ async function writeData(data) {
     const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/data/posts.json`
     // get current sha
     const getRes = await fetch(url, { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } })
-    if (!getRes.ok) throw new Error('GitHub get failed')
-    const getJ = await getRes.json()
-    const sha = getJ.sha
+    let sha = null
+    if (getRes.ok) {
+      const getJ = await getRes.json()
+      sha = getJ.sha
+    } else if (getRes.status === 404) {
+      console.error('GitHub file not found, will create new file')
+      sha = null
+    } else {
+      const txt = await getRes.text().catch(()=>'')
+      console.error('GitHub get failed', getRes.status, txt)
+      throw new Error('GitHub get failed')
+    }
     const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64')
     const body = {
       message: 'Update posts.json via API',
       content,
-      sha,
       committer: { name: 'stiri-bot', email: 'noreply@stiri' }
     }
+    if (sha) body.sha = sha
     const putRes = await fetch(url, { method: 'PUT', headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     if (!putRes.ok) {
       const txt = await putRes.text().catch(()=>'')
