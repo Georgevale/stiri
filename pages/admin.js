@@ -37,9 +37,9 @@ export default function Admin() {
       date: form.date
     }
     if (form.id) {
-      await fetch('/api/posts', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch('/api/posts', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' })
     } else {
-      await fetch('/api/posts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
+      await fetch('/api/posts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' })
     }
     resetForm()
     fetchPosts()
@@ -58,7 +58,11 @@ export default function Admin() {
 
   async function handleDelete(id) {
     if (!confirm('Ștergi acest articol?')) return
-    await fetch('/api/posts', { method: 'DELETE', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) })
+    const r = await fetch('/api/posts', { method: 'DELETE', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }), credentials: 'same-origin' })
+    if (!r.ok) {
+      const err = await r.json().catch(()=>({ error: 'Unknown' }))
+      return alert('Ștergere eșuată: ' + (err.error || r.status))
+    }
     fetchPosts()
   }
 
