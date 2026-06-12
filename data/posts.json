@@ -1,5 +1,21 @@
 [
   {
+    "id": "1781303413581",
+    "slug": "automated-test-1781303413127",
+    "title": "Automated test 1781303413127",
+    "excerpt": "excerpt test",
+    "content": "content test",
+    "image": "https://res.cloudinary.com/dwz3iz6rc/image/upload/v1781303412/stiri/ocqkczijcazcstia5xgx.png",
+    "categories": [
+      "Automated"
+    ],
+    "tags": [
+      "test"
+    ],
+    "author": "Tester",
+    "date": "2026-06-12T22:30:13.581Z"
+  },
+  {
     "id": "1781302375538",
     "slug": "primul-punct-din-istoria-sa-la-o-cup-mondial-",
     "title": "Primul punct din istoria sa la o Cupă Mondială",
