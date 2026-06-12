@@ -3,7 +3,7 @@ import Layout from '../components/Layout'
 
 export default function Admin() {
   const [posts, setPosts] = useState([])
-  const [form, setForm] = useState({ id: '', title: '', excerpt: '', content: '', category: '', tags: '' })
+  const [form, setForm] = useState({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '' })
 
   useEffect(() => {
     fetchPosts()
@@ -16,11 +16,11 @@ export default function Admin() {
   }
 
   function editPost(p) {
-    setForm({ id: p.id, title: p.title, excerpt: p.excerpt, content: p.content, category: (p.categories && p.categories[0]) || '', tags: (p.tags || []).join(', ') })
+    setForm({ id: p.id, title: p.title, excerpt: p.excerpt, content: p.content, category: (p.categories && p.categories[0]) || '', tags: (p.tags || []).join(', '), author: p.author || '', date: p.date ? (new Date(p.date)).toISOString().slice(0,10) : '' })
   }
 
   function resetForm() {
-    setForm({ id: '', title: '', excerpt: '', content: '' })
+    setForm({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '' })
   }
 
   async function handleSubmit(e) {
@@ -31,7 +31,9 @@ export default function Admin() {
       excerpt: form.excerpt,
       content: form.content,
       categories: form.category ? [form.category] : [],
-      tags: form.tags ? form.tags.split(',').map(t=>t.trim()).filter(Boolean) : []
+      tags: form.tags ? form.tags.split(',').map(t=>t.trim()).filter(Boolean) : [],
+      author: form.author,
+      date: form.date
     }
     if (form.id) {
       await fetch('/api/posts', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
@@ -70,6 +72,16 @@ export default function Admin() {
               <label>Excerpt</label>
               <br />
               <input value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} style={{ width: '100%' }} />
+            </div>
+            <div>
+              <label>Autor</label>
+              <br />
+              <input value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} style={{ width: '100%' }} />
+            </div>
+            <div>
+              <label>Data publicării</label>
+              <br />
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} style={{ width: '100%' }} />
             </div>
               <div>
                 <label>Tags (comma separated)</label>

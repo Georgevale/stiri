@@ -1,6 +1,19 @@
 import Head from 'next/head'
+import { useEffect, useState } from 'react'
 
 export default function Layout({ children }) {
+  const [auth, setAuth] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/me').then(r => r.json()).then(j => setAuth(!!j.authenticated)).catch(()=>setAuth(false))
+  }, [])
+
+  async function handleLogout() {
+    await fetch('/api/logout', { method: 'POST' }).catch(()=>{})
+    // refresh to clear server-side auth checks
+    window.location.href = '/'
+  }
+
   return (
     <div className="site-container">
       <Head>
@@ -18,7 +31,8 @@ export default function Layout({ children }) {
         </a>
         <nav className="site-nav">
           <a href="/">Acasă</a>
-          <a href="/admin">Admin</a>
+          {auth ? <a href="/admin">Admin</a> : <a href="/login">Admin</a>}
+          {auth ? <button onClick={handleLogout} style={{ marginLeft: 12 }}>Logout</button> : null}
         </nav>
       </header>
 

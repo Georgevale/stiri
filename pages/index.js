@@ -47,7 +47,7 @@ export default function Home() {
         {posts.map((p) => (
           <li key={p.id} style={{ marginBottom: 10 }}>
             <strong><a href={`/posts/${p.slug}`}>{p.title}</a></strong> — {p.excerpt}
-            <div style={{ fontSize: 12, color: '#666' }}>{(p.categories||[]).join(', ')} {p.tags && p.tags.length ? '· Tags: ' + p.tags.join(', ') : ''}</div>
+            <div style={{ fontSize: 12, color: '#666' }}>{(p.categories||[]).join(', ')} {p.tags && p.tags.length ? '· Tags: ' + p.tags.join(', ') : ''} {p.author ? '· ' + p.author : ''} {p.date ? '· ' + (new Date(p.date)).toLocaleDateString() : ''}</div>
           </li>
         ))}
       </ul>

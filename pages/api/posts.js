@@ -60,10 +60,20 @@ export default function handler(req, res) {
 
   if (method === 'POST') {
     if (!requireAuth(req, res)) return
-    const { title, excerpt, content, categories, tags } = req.body
+    const { title, excerpt, content, categories, tags, author, date } = req.body
     const id = Date.now().toString()
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-    const newPost = { id, slug, title, excerpt, content, categories: Array.isArray(categories) ? categories : (categories ? [categories] : []), tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : []) }
+    const newPost = {
+      id,
+      slug,
+      title,
+      excerpt,
+      content,
+      categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
+      tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : []),
+      author: author || 'Redacția ȘtiriAcum',
+      date: date || new Date().toISOString()
+    }
     const updated = [newPost, ...posts]
     writeData(updated)
     res.status(201).json(newPost)
@@ -72,8 +82,17 @@ export default function handler(req, res) {
 
   if (method === 'PUT') {
     if (!requireAuth(req, res)) return
-    const { id, title, excerpt, content, categories, tags } = req.body
-    const updated = posts.map((p) => (p.id === id ? { ...p, title, excerpt, content, categories: Array.isArray(categories) ? categories : (categories ? [categories] : []), tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : p.tags) } : p))
+    const { id, title, excerpt, content, categories, tags, author, date } = req.body
+    const updated = posts.map((p) => (p.id === id ? {
+      ...p,
+      title,
+      excerpt,
+      content,
+      categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
+      tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : p.tags),
+      author: author || p.author,
+      date: date || p.date
+    } : p))
     writeData(updated)
     res.status(200).json({ ok: true })
     return
