@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#0066ff"/>
+      <stop offset="1" stop-color="#00c2ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="60" height="60" rx="12" fill="url(#g)" filter="url(#shadow)" />
+  <g transform="translate(34,36) scale(1)" fill="#fff" font-family="Segoe UI, Roboto, Arial" font-weight="700" font-size="36" text-anchor="middle">
+    <text x="0" y="0">Ș</text>
+    <text x="28" y="0">A</text>
+  </g>
+
+  <g transform="translate(76,36)" font-family="Segoe UI, Roboto, Arial" fill="#0f1724">
+    <text x="0" y="-6" font-size="20" font-weight="700">ȘtiriAcum</text>
+    <text x="0" y="14" font-size="12" fill="#4b5563">Cele mai noi știri — locale &amp; internaționale</text>
+  </g>
+</svg>
