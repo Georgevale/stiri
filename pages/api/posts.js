@@ -60,7 +60,7 @@ export default function handler(req, res) {
 
   if (method === 'POST') {
     if (!requireAuth(req, res)) return
-    const { title, excerpt, content, categories, tags, author, date } = req.body
+    const { title, excerpt, content, categories, tags, author, date, image } = req.body
     const id = Date.now().toString()
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
     const newPost = {
@@ -69,6 +69,7 @@ export default function handler(req, res) {
       title,
       excerpt,
       content,
+      image: image || '',
       categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
       tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : []),
       author: author || 'Redacția ȘtiriAcum',
@@ -82,12 +83,13 @@ export default function handler(req, res) {
 
   if (method === 'PUT') {
     if (!requireAuth(req, res)) return
-    const { id, title, excerpt, content, categories, tags, author, date } = req.body
+    const { id, title, excerpt, content, categories, tags, author, date, image } = req.body
     const updated = posts.map((p) => (p.id === id ? {
       ...p,
       title,
       excerpt,
       content,
+      image: typeof image !== 'undefined' ? image : p.image,
       categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
       tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : p.tags),
       author: author || p.author,

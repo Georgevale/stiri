@@ -1,13 +1,37 @@
 [
   {
+    "id": "1781277280726",
+    "slug": "situa-ia-din-ucraina-actualizare",
+    "title": "Situa?ia din Ucraina: actualizare",
+    "excerpt": "Un rezumat al evolu?iilor recente �n conflictul din Ucraina.",
+    "content": "Conflictul din Ucraina continua sa aiba efecte semnificative asupra regiunii ?i popula?iei. �n ultimele luni au avut loc noi confruntari �n mai multe zone, iar comunitatea interna?ionala continua eforturile diplomatice pentru reducerea tensiunilor. Situa?ia umanitara ram�ne o preocupare majora, cu milioane de persoane afectate ?i nevoie urgenta de asisten?a. Detalii: (acesta este un exemplu succint; pentru un articol real, completa?i cu surse ?i evenimente verificate).",
+    "image": "/api/uploads/jtbzpt93zvuogihpymr1t7v3d.jpg",
+    "categories": [
+      "international"
+    ],
+    "tags": [
+      "ucraina",
+      "razboi"
+    ],
+    "author": "Redac?ia ?tiriAcum",
+    "date": "2026-06-12"
+  },
+  {
     "id": "1781273618076",
     "slug": "mexic-incepe-in-forta-cupa-mondiala-2026",
     "title": "Mexic începe în forță Cupa Mondială 2026.",
     "excerpt": "Mexic a debutat cu dreptul la Cupa Mondială FIFA 2026, învingând Africa de Sud cu 2-0.",
     "content": "Ciudad de México, 11 iunie 2026 – În fața unui stadion Estadio Azteca arhiplin și a milioane de telespectatori din întreaga lume, Mexicul a debutat cu dreptul la Cupa Mondială FIFA 2026, învingând Africa de Sud cu scorul de 2-0.\n\nAtmosferă de sărbătoare la debutul turneului\n\nMeciul de deschidere... (conținut redus pentru exemplu)",
-    "categories": ["sport"],
-    "tags": ["cupa mondială 2026","mexic","fotbal"],
+    "categories": [
+      "sport"
+    ],
+    "tags": [
+      "cupa mondială 2026",
+      "mexic",
+      "fotbal"
+    ],
     "author": "Redacția Știri",
-    "date": "2026-06-12T09:00:00.000Z"
+    "date": "2026-06-12",
+    "image": "/uploads/obctk1b9zcq19sr678sjvboev.jpg"
   }
 ]

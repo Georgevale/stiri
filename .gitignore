@@ -1,3 +1,38 @@
 node_modules/
 .next/
+.env.local
+data/*.json
 /.env.local
+
+# Build output
+dist/
+build/
+
+# Env files
+.env
+
+# Editor/IDE
+.vscode/
+.vscode-shared/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# OneDrive and Windows user files
+OneDrive/
+NTUSER.DAT*
+ntuser.dat*
+*.TMContainer*
+*.regtrans-ms
+
+# Logs
+*.log
+
+# Uploads / local runtime
+uploads/
+
+# Misc
+*.bak
+*.tmp

@@ -13,11 +13,12 @@ export default function PostPage({ post }) {
 
   return (
     <Layout>
-      <article>
-        <h1>{post.title}</h1>
-        <div style={{ color: '#666', marginBottom: 10 }}>{(post.categories||[]).join(', ')} {post.tags && post.tags.length ? '· Tags: ' + post.tags.join(', ') : ''} {post.author ? '· ' + post.author : ''} {post.date ? '· ' + (new Date(post.date)).toLocaleString() : ''}</div>
+      <article className="card">
+        {post.image ? <div className="article-hero"><img src={post.image} alt="article" /></div> : null}
+        <h1 className="article-title">{post.title}</h1>
+        <div className="article-meta">{(post.categories||[]).join(', ')} {post.tags && post.tags.length ? '· Tags: ' + post.tags.join(', ') : ''} {post.author ? '· ' + post.author : ''} {post.date ? '· ' + (new Date(post.date)).toLocaleString() : ''}</div>
         <p><em>{post.excerpt}</em></p>
-        <div style={{ whiteSpace: 'pre-wrap' }}>{post.content}</div>
+        <div style={{ whiteSpace: 'pre-wrap', marginTop: 12 }}>{post.content}</div>
       </article>
     </Layout>
   )

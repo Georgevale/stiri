@@ -15,7 +15,7 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className="site-container">
+    <div className="container">
       <Head>
         <title>ȘtiriAcum — cele mai noi știri</title>
         <meta name="description" content="ȘtiriAcum — publicăm cele mai proaspete știri locale și internaționale." />
@@ -27,19 +27,37 @@ export default function Layout({ children }) {
 
       <header className="site-header">
         <a className="brand" href="/">
-          <img src="/logo.svg" alt="ȘtiriAcum" style={{ height: 48, width: 'auto', display: 'block' }} />
+          <img src="/logo.svg" alt="ȘtiriAcum" />
         </a>
         <nav className="site-nav">
           <a href="/">Acasă</a>
           {auth ? <a href="/admin">Admin</a> : <a href="/login">Admin</a>}
-          {auth ? <button onClick={handleLogout} style={{ marginLeft: 12 }}>Logout</button> : null}
+          {auth ? <button className="primary" onClick={handleLogout}>Logout</button> : null}
         </nav>
       </header>
 
       <main className="site-main">{children}</main>
 
       <footer className="site-footer">
-        © {new Date().getFullYear()} ȘtiriAcum
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div>© {new Date().getFullYear()} ȘtiriAcum</div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <a href="https://www.buymeacoffee.com/" target="_blank" rel="noreferrer" className="ghost">Donate</a>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input id="subscribeEmail" placeholder="Abonează-te (email)" style={{ padding: '8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.04)', background: 'transparent', color: 'inherit' }} />
+              <button className="primary" onClick={async () => {
+                const el = document.getElementById('subscribeEmail')
+                if (!el) return
+                const email = el.value && el.value.trim()
+                if (!email) return alert('Introdu un email valid')
+                try {
+                  const r = await fetch('/api/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) })
+                  if (r.ok) { el.value=''; alert('Mulțumim! Te-ai abonat.') } else { alert('Eroare abonare') }
+                } catch (e) { alert('Eroare abonare') }
+              }}>Subscribe</button>
+            </div>
+          </div>
+        </div>
       </footer>
 
       <style jsx>{`

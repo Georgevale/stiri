@@ -30,27 +30,28 @@ export default function Home() {
 
   return (
     <Layout>
-      <h1>ȘtiriAcum</h1>
+      <h1 className="site-hero">ȘtiriAcum</h1>
 
-      <form onSubmit={handleSearch} style={{ marginBottom: 16 }}>
+      <form onSubmit={handleSearch} style={{ marginBottom: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
         <input placeholder="Caută..." value={q} onChange={(e) => setQ(e.target.value)} />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ marginLeft: 8 }}>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">Toate categoriile</option>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <button style={{ marginLeft: 8 }} type="submit">Caută</button>
-        <button type="button" onClick={() => { setQ(''); setCategory(''); fetchPosts() }} style={{ marginLeft: 8 }}>Reset</button>
+        <button className="primary" type="submit">Caută</button>
+        <button className="ghost" type="button" onClick={() => { setQ(''); setCategory(''); fetchPosts() }}>Reset</button>
       </form>
 
-      <p>Lista de articole:</p>
-      <ul>
+      <div className="posts-grid">
         {posts.map((p) => (
-          <li key={p.id} style={{ marginBottom: 10 }}>
-            <strong><a href={`/posts/${p.slug}`}>{p.title}</a></strong> — {p.excerpt}
-            <div style={{ fontSize: 12, color: '#666' }}>{(p.categories||[]).join(', ')} {p.tags && p.tags.length ? '· Tags: ' + p.tags.join(', ') : ''} {p.author ? '· ' + p.author : ''} {p.date ? '· ' + (new Date(p.date)).toLocaleDateString() : ''}</div>
-          </li>
+          <article key={p.id} className="card">
+            {p.image ? <img src={p.image} alt="thumb" /> : null}
+            <div className="card-title"><a href={`/posts/${p.slug}`}>{p.title}</a></div>
+            <div className="card-meta">{(p.categories||[]).join(', ')} {p.author ? '· ' + p.author : ''} {p.date ? '· ' + (new Date(p.date)).toLocaleDateString() : ''}</div>
+            <div className="card-excerpt">{p.excerpt}</div>
+          </article>
         ))}
-      </ul>
+      </div>
     </Layout>
   )
 }

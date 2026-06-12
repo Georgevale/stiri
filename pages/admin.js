@@ -3,7 +3,7 @@ import Layout from '../components/Layout'
 
 export default function Admin() {
   const [posts, setPosts] = useState([])
-  const [form, setForm] = useState({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '' })
+  const [form, setForm] = useState({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '', image: '' })
 
   useEffect(() => {
     fetchPosts()
@@ -16,11 +16,11 @@ export default function Admin() {
   }
 
   function editPost(p) {
-    setForm({ id: p.id, title: p.title, excerpt: p.excerpt, content: p.content, category: (p.categories && p.categories[0]) || '', tags: (p.tags || []).join(', '), author: p.author || '', date: p.date ? (new Date(p.date)).toISOString().slice(0,10) : '' })
+    setForm({ id: p.id, title: p.title, excerpt: p.excerpt, content: p.content, category: (p.categories && p.categories[0]) || '', tags: (p.tags || []).join(', '), author: p.author || '', date: p.date ? (new Date(p.date)).toISOString().slice(0,10) : '', image: p.image || '' })
   }
 
   function resetForm() {
-    setForm({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '' })
+    setForm({ id: '', title: '', excerpt: '', content: '', category: '', tags: '', author: '', date: '', image: '' })
   }
 
   async function handleSubmit(e) {
@@ -30,6 +30,7 @@ export default function Admin() {
       title: form.title,
       excerpt: form.excerpt,
       content: form.content,
+      image: form.image,
       categories: form.category ? [form.category] : [],
       tags: form.tags ? form.tags.split(',').map(t=>t.trim()).filter(Boolean) : [],
       author: form.author,
@@ -42,6 +43,17 @@ export default function Admin() {
     }
     resetForm()
     fetchPosts()
+  }
+
+  async function handleFileChange(e) {
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
+    const fd = new FormData()
+    fd.append('file', file)
+    const r = await fetch('/api/upload', { method: 'POST', body: fd })
+    if (!r.ok) return alert('Upload failed')
+    const data = await r.json()
+    setForm({ ...form, image: data.url })
   }
 
   async function handleDelete(id) {
@@ -93,6 +105,12 @@ export default function Admin() {
               <br />
               <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={8} style={{ width: '100%' }} />
             </div>
+            <div>
+              <label>Imagine (optional)</label>
+              <br />
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+              {form.image ? <div style={{ marginTop: 6 }}><img src={form.image} alt="preview" style={{ maxWidth: 200 }} /></div> : null}
+            </div>
             <div style={{ marginTop: 8 }}>
               <button type="submit">{form.id ? 'Salvează' : 'Adaugă'}</button>
               <button type="button" onClick={resetForm} style={{ marginLeft: 8 }}>Reset</button>
@@ -105,11 +123,16 @@ export default function Admin() {
           <ul>
             {posts.map((p) => (
               <li key={p.id} style={{ marginBottom: 10 }}>
-                <strong>{p.title}</strong>
-                <div>{p.excerpt}</div>
-                <div style={{ marginTop: 6 }}>
-                  <button onClick={() => editPost(p)}>Editează</button>
-                  <button onClick={() => handleDelete(p.id)} style={{ marginLeft: 8 }}>Șterge</button>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  {p.image ? <img src={p.image} alt="thumb" style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 6 }} /> : null}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700 }}>{p.title}</div>
+                    <div style={{ color: '#9aa4b2' }}>{p.excerpt}</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <button className="primary" onClick={() => editPost(p)}>Editează</button>
+                    <button className="ghost" onClick={() => handleDelete(p.id)}>Șterge</button>
+                  </div>
                 </div>
               </li>
             ))}
