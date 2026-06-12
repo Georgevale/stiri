@@ -30,7 +30,11 @@ async function readData() {
     try {
       const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/data/posts.json`
       const res = await fetch(url, { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } })
-      if (!res.ok) throw new Error('GitHub read failed')
+      if (!res.ok) {
+        const txt = await res.text().catch(()=>'')
+        console.error('GitHub read failed', res.status, txt)
+        throw new Error('GitHub read failed: ' + res.status)
+      }
       const j = await res.json()
       const content = Buffer.from(j.content, 'base64').toString('utf8')
       return JSON.parse(content)
