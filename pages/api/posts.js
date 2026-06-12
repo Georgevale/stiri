@@ -24,7 +24,20 @@ function requireAuth(req, res) {
 
 const dataFile = path.join(process.cwd(), 'data', 'posts.json')
 
-function readData() {
+async function readData() {
+  // If a GitHub token and repo are configured, read the file from the repo
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) {
+    try {
+      const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/data/posts.json`
+      const res = await fetch(url, { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } })
+      if (!res.ok) throw new Error('GitHub read failed')
+      const j = await res.json()
+      const content = Buffer.from(j.content, 'base64').toString('utf8')
+      return JSON.parse(content)
+    } catch (e) {
+      return []
+    }
+  }
   try {
     const raw = fs.readFileSync(dataFile, 'utf8')
     return JSON.parse(raw)
@@ -33,13 +46,36 @@ function readData() {
   }
 }
 
-function writeData(data) {
+async function writeData(data) {
+  // If a GitHub token and repo are configured, update the file in the repo
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) {
+    const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}/contents/data/posts.json`
+    // get current sha
+    const getRes = await fetch(url, { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } })
+    if (!getRes.ok) throw new Error('GitHub get failed')
+    const getJ = await getRes.json()
+    const sha = getJ.sha
+    const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64')
+    const body = {
+      message: 'Update posts.json via API',
+      content,
+      sha,
+      committer: { name: 'stiri-bot', email: 'noreply@stiri' }
+    }
+    const putRes = await fetch(url, { method: 'PUT', headers: { Authorization: `token ${process.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    if (!putRes.ok) {
+      const txt = await putRes.text().catch(()=>'')
+      throw new Error('GitHub update failed: ' + txt)
+    }
+    return
+  }
+
   fs.writeFileSync(dataFile, JSON.stringify(data, null, 2), 'utf8')
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const method = req.method
-  const posts = readData()
+  const posts = await readData()
 
   if (method === 'GET') {
     const { q, category, tag } = req.query
@@ -60,52 +96,64 @@ export default function handler(req, res) {
 
   if (method === 'POST') {
     if (!requireAuth(req, res)) return
-    const { title, excerpt, content, categories, tags, author, date, image } = req.body
-    const id = Date.now().toString()
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-    const newPost = {
-      id,
-      slug,
-      title,
-      excerpt,
-      content,
-      image: image || '',
-      categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
-      tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : []),
-      author: author || 'Redacția ȘtiriAcum',
-      date: date || new Date().toISOString()
+    try {
+      const { title, excerpt, content, categories, tags, author, date, image } = req.body
+      const id = Date.now().toString()
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      const newPost = {
+        id,
+        slug,
+        title,
+        excerpt,
+        content,
+        image: image || '',
+        categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
+        tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : []),
+        author: author || 'Redacția ȘtiriAcum',
+        date: date || new Date().toISOString()
+      }
+      const updated = [newPost, ...posts]
+      await writeData(updated)
+      res.status(201).json(newPost)
+    } catch (e) {
+      res.status(500).json({ error: 'Server error' })
     }
-    const updated = [newPost, ...posts]
-    writeData(updated)
-    res.status(201).json(newPost)
     return
   }
 
   if (method === 'PUT') {
     if (!requireAuth(req, res)) return
-    const { id, title, excerpt, content, categories, tags, author, date, image } = req.body
-    const updated = posts.map((p) => (p.id === id ? {
-      ...p,
-      title,
-      excerpt,
-      content,
-      image: typeof image !== 'undefined' ? image : p.image,
-      categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
-      tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : p.tags),
-      author: author || p.author,
-      date: date || p.date
-    } : p))
-    writeData(updated)
-    res.status(200).json({ ok: true })
+    try {
+      const { id, title, excerpt, content, categories, tags, author, date, image } = req.body
+      const updated = posts.map((p) => (p.id === id ? {
+        ...p,
+        title,
+        excerpt,
+        content,
+        image: typeof image !== 'undefined' ? image : p.image,
+        categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
+        tags: Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t=>t.trim()).filter(Boolean) : p.tags),
+        author: author || p.author,
+        date: date || p.date
+      } : p))
+      await writeData(updated)
+      res.status(200).json({ ok: true })
+    } catch (e) {
+      res.status(500).json({ error: 'Server error' })
+    }
     return
   }
 
   if (method === 'DELETE') {
     if (!requireAuth(req, res)) return
-    const { id } = req.body
-    const updated = posts.filter((p) => p.id !== id)
-    writeData(updated)
-    res.status(200).json({ ok: true })
+    try {
+      const { id } = req.body
+      const updated = posts.filter((p) => p.id !== id)
+      await writeData(updated)
+      res.status(200).json({ ok: true })
+    } catch (e) {
+      res.status(500).json({ error: 'Server error' })
+    }
     return
   }
 
